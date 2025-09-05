@@ -1,3 +1,5 @@
 python-chess
+pygame
 numpy
 jupyter
+tensorboard

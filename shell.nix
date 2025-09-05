@@ -47,10 +47,10 @@ pkgsUnstable.mkShell {
     echo -e "\033[33m[1/5] Initializing environment\033[0m"
     export PATH="${python}/bin:$PATH"
     # Clean previous virtual environment
-    if [ -d ./.pythonlib/venv ]; then
-      echo -e "\033[31mRemoving old virtual environment\033[0m"
-      rm -rf ./.pythonlib/venv
-    fi
+    # if [ -d ./.pythonlib/venv ]; then
+    #   echo -e "\033[31mRemoving old virtual environment\033[0m"
+    #   rm -rf ./.pythonlib/venv
+    # fi
     echo -e "\033[33m[2/5] Creating new virtual environment\033[0m"
     python -m venv ./.pythonlib/venv --system-site-packages
     source ./.pythonlib/venv/bin/activate
@@ -60,7 +60,8 @@ pkgsUnstable.mkShell {
     export CPPFLAGS="-I${pkgsUnstable.zeromq}/include"
     export LDFLAGS="-L${pkgsUnstable.zeromq}/lib -L${pkgsUnstable.stdenv.cc.cc.lib}/lib"
     echo -e "\033[33m[3/5] Installing Python requirements\033[0m"
-    pip install --no-cache-dir --force-reinstall -r requirements.txt
+    # pip install --no-cache-dir --force-reinstall -r requirements.txt
+    pip install -r requirements.txt
     echo -e "\033[33m[4/5] Configuring Jupyter kernel\033[0m"
     python -m ipykernel install --user --name=nix-venv --display-name="Nix Python 3.13"
     echo -e "\033[33m[5/5] Verifying installation\033[0m"
