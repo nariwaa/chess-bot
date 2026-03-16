@@ -1,0 +1,13 @@
+services:
+  pytorch-rocm-env:
+    image: rocm/pytorch:rocm6.4.3_ubuntu24.04_py3.12_pytorch_release_2.6.0
+    volumes:
+      - ./:/app/
+    devices:
+      - /dev/kfd:/dev/kfd # for rocm GPU access
+      - /dev/dri:/dev/dri # for rocm GPU access
+    network_mode: host
+    working_dir: /app
+    tty: true
+    stdin_open: true
+    command: bash -c "pip install -r /app/requirements.txt && bash"

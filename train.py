@@ -13,6 +13,7 @@ timestamp = datetime.now().strftime("%b%d_%H-%M-%S")
 writer = SummaryWriter(log_dir=f"runs/cnn_run_{timestamp}")
 
 
+# to solve the vanishing gradient problem during backprop
 class ResidualBlock(nn.Module):
     def __init__(self, num_channels):
         super().__init__()
@@ -29,8 +30,10 @@ class ResidualBlock(nn.Module):
         return F.relu(out)
 
 
+# the model
+# board state → CNN understands spatial patterns → "this move looks best"
 class ChessCNN(nn.Module):
-    def __init__(self, num_channels=64, num_blocks=5, out_dim=4672):
+    def __init__(self, num_channels=64, num_blocks=5, out_dim=4672): # 64 × 73 = 4672 possible moves
         super().__init__()
         self.conv_in = nn.Conv2d(13, num_channels, kernel_size=3, padding='same')  # 13 input planes
         self.bn_in = nn.BatchNorm2d(num_channels)
@@ -44,6 +47,7 @@ class ChessCNN(nn.Module):
         return self.policy_head(x)
 
 
+# convert the board into smth inputable into the CNN
 def board_to_tensor(board: chess.Board) -> torch.Tensor:
     planes = torch.zeros(13, 8, 8, dtype=torch.float32)
     piece_map = {chess.PAWN: 0, chess.KNIGHT: 1, chess.BISHOP: 2,
@@ -60,7 +64,7 @@ def board_to_tensor(board: chess.Board) -> torch.Tensor:
     return planes
 
 
-# Build move vocabulary
+# build move vocabulary
 files, ranks, promo_pieces = 'abcdefgh', '12345678', ['q', 'r', 'b', 'n']
 all_moves = set()
 for f1 in files:
@@ -199,6 +203,7 @@ def run_episode(model, model_color, opponent, gamma):
             move = opponent.get_move(board)
         board.push(move)
 
+    # reinforce behaviour if won, derinforce it if lost
     result = board.result(claim_draw=True)
     if result == "1-0":
         final_r = 1.0 if model_color == chess.WHITE else -1.0
