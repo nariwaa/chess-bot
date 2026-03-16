@@ -1,3 +1,4 @@
+import sys
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -221,10 +222,14 @@ gamma = 0.99
 num_episodes = 100000
 eval_every = 100
 save_every = 500
+save_tmp_every = 100
 phase1_threshold = 0.75     # win rate vs random needed to advance to self-play
 opponent_update_every = 500  # how often to refresh the frozen opponent in phase 2
 
 model = ChessCNN(out_dim=len(idx_to_move))
+if len(sys.argv) > 1:
+    model.load_state_dict(torch.load(sys.argv[1], weights_only=True))
+    print(f"loaded base model from {sys.argv[1]}")
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 benchmark_player = RandomPlayer()
 
@@ -277,6 +282,9 @@ for ep in range(1, num_episodes + 1):
             frozen_opponent = ModelPlayer(copy.deepcopy(model).eval())
             torch.save(model.state_dict(), "chess_policy_cnn_phase1_complete.pt")
             print(f"*** Phase 1 complete! Switching to self-play. ***")
+
+    if ep % save_tmp_every == 0:
+        torch.save(model.state_dict(), f"modeltmp/chess_policy_cnn_ep{ep}.pt")
 
     if ep % save_every == 0:
         torch.save(model.state_dict(), f"chess_policy_cnn_ep{ep}.pt")
