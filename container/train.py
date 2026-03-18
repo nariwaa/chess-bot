@@ -217,8 +217,8 @@ def run_episode(model, model_color, opponent, gamma):
 
 
 # --- Hyperparameters ---
-learning_rate = 1e-4
-gamma = 0.99
+learning_rate = 1e-2
+gamma = 0.49
 num_episodes = 100000
 eval_every = 100
 save_every = 500
